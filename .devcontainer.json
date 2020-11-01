@@ -1,0 +1,8 @@
+{
+  "containerUser": "node",
+  "extensions": [ "elmtooling.elm-ls-vscode" ],
+  "forwardPorts": [ 8000 ],
+  "image": "node:15.0.1-buster",
+  "postCreateCommand": "npm install",
+  "settings": { "elmLS.elmAnalyseTrigger": "save" }
+}
