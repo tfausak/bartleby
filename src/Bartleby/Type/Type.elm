@@ -1,4 +1,4 @@
-module Bartleby.Type.Type exposing (Type(..), decode, encode)
+module Bartleby.Type.Type exposing (Type(..), decode, encode, fromString, toString)
 
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -9,18 +9,38 @@ type Type
     | Punctuation
 
 
+fromString : String -> Maybe Type
+fromString string =
+    case string of
+        "pronunciation" ->
+            Just Pronunciation
+
+        "punctuation" ->
+            Just Punctuation
+
+        _ ->
+            Nothing
+
+
+toString : Type -> String
+toString tipe =
+    case tipe of
+        Pronunciation ->
+            "pronunciation"
+
+        Punctuation ->
+            "punctuation"
+
+
 decode : Decode.Decoder Type
 decode =
     Decode.andThen
         (\string ->
-            case string of
-                "pronunciation" ->
-                    Decode.succeed Pronunciation
+            case fromString string of
+                Just tipe ->
+                    Decode.succeed tipe
 
-                "punctuation" ->
-                    Decode.succeed Punctuation
-
-                _ ->
+                Nothing ->
                     Decode.fail ("unknown type: " ++ string)
         )
         Decode.string
@@ -28,9 +48,4 @@ decode =
 
 encode : Type -> Encode.Value
 encode tipe =
-    case tipe of
-        Pronunciation ->
-            Encode.string "pronunciation"
-
-        Punctuation ->
-            Encode.string "punctuation"
+    Encode.string (toString tipe)

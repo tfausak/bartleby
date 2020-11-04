@@ -7,6 +7,7 @@ import Bartleby.Type.Model as Model
 import Bartleby.Type.Number as Number
 import Bartleby.Type.ResultItem as ResultItem
 import Bartleby.Type.Type as Type
+import Bartleby.Utility as Utility
 import Browser
 import Html
 import Html.Attributes as Attr
@@ -99,7 +100,17 @@ viewResultItem resultItem =
                 content =
                     Html.span
                         [ Attr.style "background-color" backgroundColor
-                        , Attr.title (String.fromInt confidence ++ "%")
+                        , Attr.title <|
+                            String.join " "
+                                [ "type:"
+                                , Type.toString resultItem.tipe
+                                , "confidence:"
+                                , String.fromInt confidence
+                                , "start:"
+                                , String.fromFloat (Utility.maybe 0 Number.toFloat resultItem.startTime)
+                                , "end:"
+                                , String.fromFloat (Utility.maybe 0 Number.toFloat resultItem.endTime)
+                                ]
                         ]
                         [ Html.text alternative.content ]
             in

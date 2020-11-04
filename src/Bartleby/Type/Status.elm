@@ -1,4 +1,4 @@
-module Bartleby.Type.Status exposing (Status(..), decode, encode)
+module Bartleby.Type.Status exposing (Status(..), decode, encode, fromString, toString)
 
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -8,15 +8,32 @@ type Status
     = Completed
 
 
+fromString : String -> Maybe Status
+fromString string =
+    case string of
+        "COMPLETED" ->
+            Just Completed
+
+        _ ->
+            Nothing
+
+
+toString : Status -> String
+toString status =
+    case status of
+        Completed ->
+            "COMPLETED"
+
+
 decode : Decode.Decoder Status
 decode =
     Decode.andThen
         (\string ->
-            case string of
-                "COMPLETED" ->
-                    Decode.succeed Completed
+            case fromString string of
+                Just status ->
+                    Decode.succeed status
 
-                _ ->
+                Nothing ->
                     Decode.fail ("unknown status: " ++ string)
         )
         Decode.string
@@ -24,6 +41,4 @@ decode =
 
 encode : Status -> Encode.Value
 encode status =
-    case status of
-        Completed ->
-            Encode.string "COMPLETED"
+    Encode.string (toString status)

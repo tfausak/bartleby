@@ -25,7 +25,7 @@ update message model =
             , case model.job of
                 FileData.Loaded (Ok job) ->
                     Download.string
-                        "transcript.json"
+                        (job.jobName ++ ".json")
                         "application/json"
                         (Encode.encode 2 (Job.encode job))
 
