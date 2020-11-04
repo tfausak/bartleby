@@ -15,6 +15,7 @@ punctuation. If that is important to you, you'll have to use something else.
 - [x] Allow exporting the transcript as JSON.
 - [x] Display speaker information somehow.
 - [x] Create maximal speaker label segments.
+- [x] Avoid defaulting times to zero (and other values). (Instead drop those items?)
 - [ ] Allow editing a single word at a time.
 - [ ] Delete a word.
 - [ ] Combine two words.
@@ -22,5 +23,4 @@ punctuation. If that is important to you, you'll have to use something else.
 - [ ] Improve performance of speaker identification.
 - [ ] Handle more speakers.
 - [ ] Allow changing speaker names.
-- [ ] Avoid defaulting times to zero (and other values). (Instead drop those items?)
 - [ ] Come up with better internal representation of job and chunks.

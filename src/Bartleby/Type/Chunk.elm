@@ -65,36 +65,22 @@ fromResultItems segmentItems resultItems =
                         (combineResultItems first second :: rest)
 
 
-combineResultItems : ResultItem.ResultItem -> ResultItem.ResultItem -> ResultItem.ResultItem
-combineResultItems first second =
-    { first
-        | alternatives =
-            List.map
-                (\( x, y ) -> { x | content = x.content ++ y.content })
-                (List.cartesianProduct first.alternatives second.alternatives)
-        , endTime =
-            Maybe.combineWith Number.maximum first.endTime second.endTime
-        , startTime =
-            Maybe.combineWith Number.minimum first.startTime second.startTime
-    }
-
-
 fromResultItem : List SegmentItem.SegmentItem -> ResultItem.ResultItem -> Maybe Chunk
 fromResultItem segmentItems resultItem =
-    case resultItem.alternatives of
-        [] ->
-            Nothing
-
-        alternative :: _ ->
+    case ( resultItem.startTime, resultItem.endTime, resultItem.alternatives ) of
+        ( Just start, Just end, alternative :: _ ) ->
             Just
                 { confidence = Number.toFloat alternative.confidence
                 , content = alternative.content
-                , end = Maybe.maybe 0 Number.toFloat resultItem.endTime
+                , end = Number.toFloat end
                 , speaker =
                     Maybe.map .speakerLabel
                         (List.find (contains resultItem) segmentItems)
-                , start = Maybe.maybe 0 Number.toFloat resultItem.startTime
+                , start = Number.toFloat start
                 }
+
+        _ ->
+            Nothing
 
 
 contains : ResultItem.ResultItem -> SegmentItem.SegmentItem -> Bool
@@ -113,6 +99,20 @@ contains resultItem segmentItem =
 
         _ ->
             False
+
+
+combineResultItems : ResultItem.ResultItem -> ResultItem.ResultItem -> ResultItem.ResultItem
+combineResultItems first second =
+    { first
+        | alternatives =
+            List.map
+                (\( x, y ) -> { x | content = x.content ++ y.content })
+                (List.cartesianProduct first.alternatives second.alternatives)
+        , endTime =
+            Maybe.combineWith Number.maximum first.endTime second.endTime
+        , startTime =
+            Maybe.combineWith Number.minimum first.startTime second.startTime
+    }
 
 
 toResults : List Chunk -> Results.Results
