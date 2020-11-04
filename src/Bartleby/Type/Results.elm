@@ -7,7 +7,7 @@ module Bartleby.Type.Results exposing
 import Bartleby.Type.ResultItem as ResultItem
 import Bartleby.Type.SpeakerLabels as SpeakerLabels
 import Bartleby.Type.Transcript as Transcript
-import Bartleby.Utility as Utility
+import Bartleby.Utility.Encode as Encode
 import Json.Decode as Decode
 import Json.Encode as Encode
 
@@ -34,6 +34,6 @@ encode : Results -> Encode.Value
 encode x =
     Encode.object
         [ ( "items", Encode.list ResultItem.encode x.items )
-        , ( "speakerLabels", Utility.encodeMaybe SpeakerLabels.encode x.speakerLabels )
+        , ( "speaker_labels", Encode.maybe SpeakerLabels.encode x.speakerLabels )
         , ( "transcripts", Encode.list Transcript.encode x.transcripts )
         ]

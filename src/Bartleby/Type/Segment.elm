@@ -41,5 +41,5 @@ encode x =
         [ ( "end_time", Number.encode x.endTime )
         , ( "items", Encode.list SegmentItem.encode x.items )
         , ( "speaker_label", Encode.string x.speakerLabel )
-        , ( "end_time", Number.encode x.startTime )
+        , ( "start_time", Number.encode x.startTime )
         ]

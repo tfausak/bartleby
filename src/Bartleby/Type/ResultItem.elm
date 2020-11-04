@@ -7,7 +7,7 @@ module Bartleby.Type.ResultItem exposing
 import Bartleby.Type.Alternative as Alternative
 import Bartleby.Type.Number as Number
 import Bartleby.Type.Type as Type
-import Bartleby.Utility as Utility
+import Bartleby.Utility.Encode as Encode
 import Json.Decode as Decode
 import Json.Encode as Encode
 
@@ -33,7 +33,7 @@ encode : ResultItem -> Encode.Value
 encode x =
     Encode.object
         [ ( "alternatives", Encode.list Alternative.encode x.alternatives )
-        , ( "end_time", Utility.encodeMaybe Number.encode x.endTime )
-        , ( "start_time", Utility.encodeMaybe Number.encode x.startTime )
+        , ( "end_time", Encode.maybe Number.encode x.endTime )
+        , ( "start_time", Encode.maybe Number.encode x.startTime )
         , ( "type", Type.encode x.tipe )
         ]

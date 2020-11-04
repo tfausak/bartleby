@@ -13,7 +13,8 @@ import Bartleby.Type.SegmentItem as SegmentItem
 import Bartleby.Type.SpeakerLabels as SpeakerLabels
 import Bartleby.Type.Transcript as Transcript
 import Bartleby.Type.Type as Type
-import Bartleby.Utility as Utility
+import Bartleby.Utility.List as List
+import Bartleby.Utility.Maybe as Maybe
 import Set
 
 
@@ -49,13 +50,13 @@ fromResultItems segmentItems resultItems =
             []
 
         [ resultItem ] ->
-            Utility.maybeToList (fromResultItem segmentItems resultItem)
+            Maybe.toList (fromResultItem segmentItems resultItem)
 
         first :: second :: rest ->
             case second.tipe of
                 Type.Pronunciation ->
                     List.append
-                        (Utility.maybeToList (fromResultItem segmentItems first))
+                        (Maybe.toList (fromResultItem segmentItems first))
                         (fromResultItems segmentItems (second :: rest))
 
                 Type.Punctuation ->
@@ -70,11 +71,11 @@ combineResultItems first second =
         | alternatives =
             List.map
                 (\( x, y ) -> { x | content = x.content ++ y.content })
-                (cartesianProduct first.alternatives second.alternatives)
+                (List.cartesianProduct first.alternatives second.alternatives)
         , endTime =
-            combineMaybes Number.maximum first.endTime second.endTime
+            Maybe.combineWith Number.maximum first.endTime second.endTime
         , startTime =
-            combineMaybes Number.minimum first.startTime second.startTime
+            Maybe.combineWith Number.minimum first.startTime second.startTime
     }
 
 
@@ -88,43 +89,30 @@ fromResultItem segmentItems resultItem =
             Just
                 { confidence = Number.toFloat alternative.confidence
                 , content = alternative.content
-                , end = Utility.maybe 0 Number.toFloat resultItem.endTime
+                , end = Maybe.maybe 0 Number.toFloat resultItem.endTime
                 , speaker =
-                    List.foldl
-                        (\x m ->
-                            case m of
-                                Just _ ->
-                                    m
-
-                                Nothing ->
-                                    if contains x resultItem then
-                                        Just x.speakerLabel
-
-                                    else
-                                        Nothing
-                        )
-                        Nothing
-                        segmentItems
-                , start = Utility.maybe 0 Number.toFloat resultItem.startTime
+                    Maybe.map .speakerLabel
+                        (List.find (contains resultItem) segmentItems)
+                , start = Maybe.maybe 0 Number.toFloat resultItem.startTime
                 }
 
 
-contains : SegmentItem.SegmentItem -> ResultItem.ResultItem -> Bool
-contains s r =
-    let
-        s0 =
-            Number.toFloat s.startTime
+contains : ResultItem.ResultItem -> SegmentItem.SegmentItem -> Bool
+contains resultItem segmentItem =
+    case ( resultItem.startTime, resultItem.endTime ) of
+        ( Just resultStart, Just resultEnd ) ->
+            let
+                segmentStart =
+                    Number.toFloat segmentItem.startTime
 
-        s1 =
-            Number.toFloat s.endTime
+                segmentEnd =
+                    Number.toFloat segmentItem.endTime
+            in
+            (segmentStart <= Number.toFloat resultStart)
+                && (segmentEnd >= Number.toFloat resultEnd)
 
-        r0 =
-            Utility.maybe -1 Number.toFloat r.startTime
-
-        r1 =
-            Utility.maybe 9999 Number.toFloat r.endTime
-    in
-    s0 <= r0 && s1 >= r1
+        _ ->
+            False
 
 
 toResults : List Chunk -> Results.Results
@@ -153,22 +141,34 @@ toAlternative chunk =
 
 toSpeakerLabels : List Chunk -> SpeakerLabels.SpeakerLabels
 toSpeakerLabels chunks =
-    { segments = List.filterMap toSegment chunks
+    { segments = List.filterMap toSegment (List.groupOn .speaker chunks)
     , speakers = Set.size (Set.fromList (List.filterMap .speaker chunks))
     }
 
 
-toSegment : Chunk -> Maybe Segment.Segment
-toSegment chunk =
-    Maybe.map
-        (\speaker ->
-            { endTime = Number.fromFloat chunk.end
-            , items = Utility.maybeToList (toSegmentItem chunk)
-            , speakerLabel = speaker
-            , startTime = Number.fromFloat chunk.start
-            }
-        )
-        chunk.speaker
+toSegment : List Chunk -> Maybe Segment.Segment
+toSegment chunks =
+    let
+        maybeSpeaker =
+            Maybe.andThen .speaker (List.head chunks)
+
+        maybeStart =
+            List.minimum (List.map .start chunks)
+
+        maybeEnd =
+            List.maximum (List.map .end chunks)
+    in
+    case ( maybeSpeaker, maybeStart, maybeEnd ) of
+        ( Just speaker, Just start, Just end ) ->
+            Just
+                { endTime = Number.fromFloat end
+                , items = List.filterMap toSegmentItem chunks
+                , speakerLabel = speaker
+                , startTime = Number.fromFloat start
+                }
+
+        _ ->
+            Nothing
 
 
 toSegmentItem : Chunk -> Maybe SegmentItem.SegmentItem
@@ -187,24 +187,3 @@ toTranscript : List Chunk -> Transcript.Transcript
 toTranscript chunks =
     { transcript = String.join " " (List.map .content chunks)
     }
-
-
-cartesianProduct : List a -> List b -> List ( a, b )
-cartesianProduct xs ys =
-    List.concatMap (\x -> List.map (\y -> ( x, y )) ys) xs
-
-
-combineMaybes : (a -> a -> a) -> Maybe a -> Maybe a -> Maybe a
-combineMaybes f mx my =
-    case ( mx, my ) of
-        ( Just x, Just y ) ->
-            Just (f x y)
-
-        ( Just x, Nothing ) ->
-            Just x
-
-        ( Nothing, Just y ) ->
-            Just y
-
-        ( Nothing, Nothing ) ->
-            Nothing

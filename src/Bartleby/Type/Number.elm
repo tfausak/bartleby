@@ -8,7 +8,8 @@ module Bartleby.Type.Number exposing
     , toFloat
     )
 
-import Bartleby.Utility as Utility
+import Bartleby.Utility.Decode as Decode
+import Bartleby.Utility.Encode as Encode
 import Json.Decode as Decode
 import Json.Encode as Encode
 
@@ -32,12 +33,12 @@ toFloat (Number x) =
 
 decode : Decode.Decoder Number
 decode =
-    Decode.map fromFloat (Utility.decodeViaString Decode.float)
+    Decode.map fromFloat (Decode.viaString Decode.float)
 
 
 encode : Number -> Encode.Value
 encode x =
-    Utility.encodeViaString Encode.float (toFloat x)
+    Encode.viaString Encode.float (toFloat x)
 
 
 maximum : Number -> Number -> Number

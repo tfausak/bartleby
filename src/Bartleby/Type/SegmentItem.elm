@@ -29,5 +29,5 @@ encode x =
     Encode.object
         [ ( "end_time", Number.encode x.endTime )
         , ( "speaker_label", Encode.string x.speakerLabel )
-        , ( "end_time", Number.encode x.startTime )
+        , ( "start_time", Number.encode x.startTime )
         ]

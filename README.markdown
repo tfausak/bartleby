@@ -14,12 +14,12 @@ punctuation. If that is important to you, you'll have to use something else.
 
 - [x] Allow exporting the transcript as JSON.
 - [x] Display speaker information somehow.
+- [x] Create maximal speaker label segments.
 - [ ] Allow editing a single word at a time.
 - [ ] Delete a word.
 - [ ] Combine two words.
 - [ ] Split a word.
 - [ ] Improve performance of speaker identification.
-- [ ] Create maximal speaker label segments.
 - [ ] Handle more speakers.
 - [ ] Allow changing speaker names.
 - [ ] Avoid defaulting times to zero (and other values). (Instead drop those items?)
