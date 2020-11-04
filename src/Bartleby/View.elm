@@ -8,6 +8,7 @@ import Browser
 import Html
 import Html.Attributes as Attr
 import Html.Events as Html
+import Json.Decode as Decode
 
 
 view : Model.Model -> Browser.Document Message.Message
@@ -47,9 +48,11 @@ viewJob model =
 
         FileData.Loaded result ->
             case result of
-                Err _ ->
-                    Html.p []
-                        [ Html.text "Failed to parse transcript!" ]
+                Err err ->
+                    Html.div []
+                        [ Html.p [] [ Html.text "Failed to parse transcript!" ]
+                        , Html.pre [] [ Html.text (Decode.errorToString err) ]
+                        ]
 
                 Ok _ ->
                     Html.p
