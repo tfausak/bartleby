@@ -1,4 +1,10 @@
-module Bartleby.Utility exposing (decodeViaString, encodeMaybe, encodeViaString, maybe)
+module Bartleby.Utility exposing
+    ( decodeViaString
+    , encodeMaybe
+    , encodeViaString
+    , maybe
+    , maybeToList
+    )
 
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -42,3 +48,8 @@ maybe d f m =
 
         Just x ->
             f x
+
+
+maybeToList : Maybe a -> List a
+maybeToList =
+    maybe [] List.singleton

@@ -1,4 +1,10 @@
-module Bartleby.Type.Type exposing (Type(..), decode, encode, fromString, toString)
+module Bartleby.Type.Type exposing
+    ( Type(..)
+    , decode
+    , encode
+    , fromString
+    , toString
+    )
 
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -10,8 +16,8 @@ type Type
 
 
 fromString : String -> Maybe Type
-fromString string =
-    case string of
+fromString x =
+    case x of
         "pronunciation" ->
             Just Pronunciation
 
@@ -23,8 +29,8 @@ fromString string =
 
 
 toString : Type -> String
-toString tipe =
-    case tipe of
+toString x =
+    case x of
         Pronunciation ->
             "pronunciation"
 
@@ -47,5 +53,5 @@ decode =
 
 
 encode : Type -> Encode.Value
-encode tipe =
-    Encode.string (toString tipe)
+encode x =
+    Encode.string (toString x)

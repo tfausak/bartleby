@@ -1,4 +1,8 @@
-module Bartleby.Type.Job exposing (Job, decode, encode)
+module Bartleby.Type.Job exposing
+    ( Job
+    , decode
+    , encode
+    )
 
 import Bartleby.Type.Results as Results
 import Bartleby.Type.Status as Status
@@ -24,10 +28,10 @@ decode =
 
 
 encode : Job -> Encode.Value
-encode job =
+encode x =
     Encode.object
-        [ ( "accountId", Encode.string job.accountId )
-        , ( "jobName", Encode.string job.jobName )
-        , ( "results", Results.encode job.results )
-        , ( "status", Status.encode job.status )
+        [ ( "accountId", Encode.string x.accountId )
+        , ( "jobName", Encode.string x.jobName )
+        , ( "results", Results.encode x.results )
+        , ( "status", Status.encode x.status )
         ]

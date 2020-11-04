@@ -1,4 +1,8 @@
-module Bartleby.Type.Results exposing (Results, decode, encode)
+module Bartleby.Type.Results exposing
+    ( Results
+    , decode
+    , encode
+    )
 
 import Bartleby.Type.ResultItem as ResultItem
 import Bartleby.Type.SpeakerLabels as SpeakerLabels
@@ -8,8 +12,8 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 
 
-{-| This has a list of transcripts, but that list usually only has one transcript
-in it.
+{-| This has a list of transcripts, but that list usually only has one
+transcript in it.
 -}
 type alias Results =
     { items : List ResultItem.ResultItem
@@ -27,9 +31,9 @@ decode =
 
 
 encode : Results -> Encode.Value
-encode results =
+encode x =
     Encode.object
-        [ ( "items", Encode.list ResultItem.encode results.items )
-        , ( "speakerLabels", Utility.encodeMaybe SpeakerLabels.encode results.speakerLabels )
-        , ( "transcripts", Encode.list Transcript.encode results.transcripts )
+        [ ( "items", Encode.list ResultItem.encode x.items )
+        , ( "speakerLabels", Utility.encodeMaybe SpeakerLabels.encode x.speakerLabels )
+        , ( "transcripts", Encode.list Transcript.encode x.transcripts )
         ]

@@ -1,4 +1,8 @@
-module Bartleby.Type.SegmentItem exposing (SegmentItem, decode, encode)
+module Bartleby.Type.SegmentItem exposing
+    ( SegmentItem
+    , decode
+    , encode
+    )
 
 import Bartleby.Type.Number as Number
 import Json.Decode as Decode
@@ -21,9 +25,9 @@ decode =
 
 
 encode : SegmentItem -> Encode.Value
-encode segmentItem =
+encode x =
     Encode.object
-        [ ( "end_time", Number.encode segmentItem.endTime )
-        , ( "speaker_label", Encode.string segmentItem.speakerLabel )
-        , ( "end_time", Number.encode segmentItem.startTime )
+        [ ( "end_time", Number.encode x.endTime )
+        , ( "speaker_label", Encode.string x.speakerLabel )
+        , ( "end_time", Number.encode x.startTime )
         ]

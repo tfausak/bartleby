@@ -1,4 +1,8 @@
-module Bartleby.Type.Segment exposing (Segment, decode, encode)
+module Bartleby.Type.Segment exposing
+    ( Segment
+    , decode
+    , encode
+    )
 
 import Bartleby.Type.Number as Number
 import Bartleby.Type.SegmentItem as SegmentItem
@@ -12,6 +16,7 @@ contained within give more details about individual words.
 The speaker label is usually a string like `"spk_N"`, where "N" is a number
 starting from 0. So if you have two speakers, they are probably `"spk_0"` and
 `"spk_1"`.
+
 -}
 type alias Segment =
     { endTime : Number.Number
@@ -31,10 +36,10 @@ decode =
 
 
 encode : Segment -> Encode.Value
-encode segment =
+encode x =
     Encode.object
-        [ ( "end_time", Number.encode segment.endTime )
-        , ( "items", Encode.list SegmentItem.encode segment.items )
-        , ( "speaker_label", Encode.string segment.speakerLabel )
-        , ( "end_time", Number.encode segment.startTime )
+        [ ( "end_time", Number.encode x.endTime )
+        , ( "items", Encode.list SegmentItem.encode x.items )
+        , ( "speaker_label", Encode.string x.speakerLabel )
+        , ( "end_time", Number.encode x.startTime )
         ]

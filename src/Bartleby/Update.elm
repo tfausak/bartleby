@@ -1,5 +1,6 @@
 module Bartleby.Update exposing (update)
 
+import Bartleby.Type.Chunk as Chunk
 import Bartleby.Type.FileData as FileData
 import Bartleby.Type.Job as Job
 import Bartleby.Type.Message as Message
@@ -24,19 +25,31 @@ update message model =
             ( model
             , case model.job of
                 FileData.Loaded (Ok job) ->
-                    Download.string
-                        (job.jobName ++ ".json")
-                        "application/json"
-                        (Encode.encode 2 (Job.encode job))
+                    { job | results = Chunk.toResults model.chunks }
+                        |> Job.encode
+                        |> Encode.encode 2
+                        |> Download.string
+                            (job.jobName ++ ".json")
+                            "application/json"
 
                 _ ->
                     Cmd.none
             )
 
         Message.JobLoaded string ->
-            ( { model | job = FileData.Loaded (Decode.decodeString Job.decode string) }
-            , Cmd.none
-            )
+            let
+                newModel =
+                    case Decode.decodeString Job.decode string of
+                        Err err ->
+                            { model | job = FileData.Loaded (Err err) }
+
+                        Ok job ->
+                            { model
+                                | chunks = Chunk.fromResults job.results
+                                , job = FileData.Loaded (Ok job)
+                            }
+            in
+            ( newModel, Cmd.none )
 
         Message.JobRequested ->
             ( { model | job = FileData.Requested }

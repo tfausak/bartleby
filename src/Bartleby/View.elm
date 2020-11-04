@@ -1,13 +1,9 @@
 module Bartleby.View exposing (view)
 
+import Bartleby.Type.Chunk as Chunk
 import Bartleby.Type.FileData as FileData
-import Bartleby.Type.Job as Job
 import Bartleby.Type.Message as Message
 import Bartleby.Type.Model as Model
-import Bartleby.Type.Number as Number
-import Bartleby.Type.ResultItem as ResultItem
-import Bartleby.Type.Type as Type
-import Bartleby.Utility as Utility
 import Browser
 import Html
 import Html.Attributes as Attr
@@ -32,14 +28,14 @@ view model =
                 ]
                 [ Html.text "Download transcript" ]
             ]
-        , viewJob model.job
+        , viewJob model
         ]
     }
 
 
-viewJob : FileData.FileData (Result x Job.Job) -> Html.Html Message.Message
-viewJob fileData =
-    case fileData of
+viewJob : Model.Model -> Html.Html Message.Message
+viewJob model =
+    case model.job of
         FileData.NotAsked ->
             Html.p [] [ Html.text "Click the button." ]
 
@@ -55,68 +51,66 @@ viewJob fileData =
                     Html.p []
                         [ Html.text "Failed to parse transcript!" ]
 
-                Ok job ->
+                Ok _ ->
                     Html.p
                         [ Attr.style "font-family" "sans-serif"
                         , Attr.style "line-height" "1.5em"
                         , Attr.style "padding" "1.5em"
                         ]
-                        (List.concatMap viewResultItem job.results.items)
+                        (List.concatMap viewChunk model.chunks)
 
 
-viewResultItem : ResultItem.ResultItem -> List (Html.Html Message.Message)
-viewResultItem resultItem =
-    case List.head resultItem.alternatives of
-        Nothing ->
-            []
+viewChunk : Chunk.Chunk -> List (Html.Html Message.Message)
+viewChunk chunk =
+    let
+        backgroundColor =
+            if chunk.confidence >= 1.0 then
+                "inherit"
 
-        Just alternative ->
-            let
-                confidence =
-                    alternative.confidence
-                        |> Number.toFloat
-                        |> (\float -> float * 100)
-                        |> round
+            else if chunk.confidence >= 0.8 then
+                "#ffc"
 
-                backgroundColor =
-                    if confidence >= 100 || resultItem.tipe == Type.Punctuation then
-                        "inherit"
+            else if chunk.confidence >= 0.6 then
+                "#ff9"
 
-                    else if confidence >= 80 then
-                        "#fcc"
+            else if chunk.confidence >= 0.4 then
+                "#ff6"
 
-                    else if confidence >= 60 then
-                        "#f99"
+            else if chunk.confidence >= 0.2 then
+                "#ff3"
 
-                    else if confidence >= 40 then
-                        "#f66"
+            else
+                "#ff0"
 
-                    else if confidence >= 20 then
-                        "#f33"
+        color =
+            case chunk.speaker of
+                Just "spk_0" ->
+                    "#090"
 
-                    else
-                        "#f00"
+                Just "spk_1" ->
+                    "#009"
 
-                content =
-                    Html.span
-                        [ Attr.style "background-color" backgroundColor
-                        , Attr.title <|
-                            String.join " "
-                                [ "type:"
-                                , Type.toString resultItem.tipe
-                                , "confidence:"
-                                , String.fromInt confidence
-                                , "start:"
-                                , String.fromFloat (Utility.maybe 0 Number.toFloat resultItem.startTime)
-                                , "end:"
-                                , String.fromFloat (Utility.maybe 0 Number.toFloat resultItem.endTime)
-                                ]
-                        ]
-                        [ Html.text alternative.content ]
-            in
-            case resultItem.tipe of
-                Type.Pronunciation ->
-                    [ Html.text " ", content ]
+                Just "spk_2" ->
+                    "#900"
 
-                Type.Punctuation ->
-                    [ content ]
+                _ ->
+                    "inherit"
+    in
+    [ Html.span
+        [ Attr.style "background-color" backgroundColor
+        , Attr.style "color" color
+        , Attr.title <|
+            String.join " "
+                [ "confidence:"
+                , String.fromFloat chunk.confidence
+                , "start:"
+                , String.fromFloat chunk.start
+                , "end:"
+                , String.fromFloat chunk.end
+                , "speaker:"
+                , Maybe.withDefault "unknown" chunk.speaker
+                ]
+        ]
+        [ Html.text chunk.content ]
+    , Html.text " "
+    ]

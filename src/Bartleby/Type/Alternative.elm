@@ -1,4 +1,8 @@
-module Bartleby.Type.Alternative exposing (Alternative, decode, encode)
+module Bartleby.Type.Alternative exposing
+    ( Alternative
+    , decode
+    , encode
+    )
 
 import Bartleby.Type.Number as Number
 import Json.Decode as Decode
@@ -22,8 +26,8 @@ decode =
 
 
 encode : Alternative -> Encode.Value
-encode alternative =
+encode x =
     Encode.object
-        [ ( "confidence", Number.encode alternative.confidence )
-        , ( "content", Encode.string alternative.content )
+        [ ( "confidence", Number.encode x.confidence )
+        , ( "content", Encode.string x.content )
         ]

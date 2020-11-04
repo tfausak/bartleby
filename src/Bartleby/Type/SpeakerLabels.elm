@@ -1,4 +1,8 @@
-module Bartleby.Type.SpeakerLabels exposing (SpeakerLabels, decode, encode)
+module Bartleby.Type.SpeakerLabels exposing
+    ( SpeakerLabels
+    , decode
+    , encode
+    )
 
 import Bartleby.Type.Segment as Segment
 import Json.Decode as Decode
@@ -19,8 +23,8 @@ decode =
 
 
 encode : SpeakerLabels -> Encode.Value
-encode speakerLabels =
+encode x =
     Encode.object
-        [ ( "segments", Encode.list Segment.encode speakerLabels.segments )
-        , ( "speakers", Encode.int speakerLabels.speakers )
+        [ ( "segments", Encode.list Segment.encode x.segments )
+        , ( "speakers", Encode.int x.speakers )
         ]

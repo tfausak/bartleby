@@ -3,8 +3,8 @@ module Bartleby.Type.FileData exposing (FileData(..))
 import File
 
 
-type FileData value
+type FileData a
     = NotAsked
     | Requested
     | Selected File.File
-    | Loaded value
+    | Loaded a

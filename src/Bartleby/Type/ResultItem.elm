@@ -1,4 +1,8 @@
-module Bartleby.Type.ResultItem exposing (ResultItem, decode, encode)
+module Bartleby.Type.ResultItem exposing
+    ( ResultItem
+    , decode
+    , encode
+    )
 
 import Bartleby.Type.Alternative as Alternative
 import Bartleby.Type.Number as Number
@@ -26,10 +30,10 @@ decode =
 
 
 encode : ResultItem -> Encode.Value
-encode resultItem =
+encode x =
     Encode.object
-        [ ( "alternatives", Encode.list Alternative.encode resultItem.alternatives )
-        , ( "end_time", Utility.encodeMaybe Number.encode resultItem.endTime )
-        , ( "start_time", Utility.encodeMaybe Number.encode resultItem.startTime )
-        , ( "type", Type.encode resultItem.tipe )
+        [ ( "alternatives", Encode.list Alternative.encode x.alternatives )
+        , ( "end_time", Utility.encodeMaybe Number.encode x.endTime )
+        , ( "start_time", Utility.encodeMaybe Number.encode x.startTime )
+        , ( "type", Type.encode x.tipe )
         ]

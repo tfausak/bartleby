@@ -22,7 +22,9 @@ main =
 
 init : Flags.Flags -> ( Model.Model, Cmd Message.Message )
 init _ =
-    ( { job = FileData.NotAsked }
+    ( { chunks = []
+      , job = FileData.NotAsked
+      }
     , Task.perform identity (Task.succeed Message.DoNothing)
     )
 

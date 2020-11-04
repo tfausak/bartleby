@@ -1,4 +1,12 @@
-module Bartleby.Type.Number exposing (Number, decode, encode, fromFloat, toFloat)
+module Bartleby.Type.Number exposing
+    ( Number
+    , decode
+    , encode
+    , fromFloat
+    , maximum
+    , minimum
+    , toFloat
+    )
 
 import Bartleby.Utility as Utility
 import Json.Decode as Decode
@@ -18,8 +26,8 @@ fromFloat =
 
 
 toFloat : Number -> Float
-toFloat (Number float) =
-    float
+toFloat (Number x) =
+    x
 
 
 decode : Decode.Decoder Number
@@ -28,5 +36,20 @@ decode =
 
 
 encode : Number -> Encode.Value
-encode number =
-    Utility.encodeViaString Encode.float (toFloat number)
+encode x =
+    Utility.encodeViaString Encode.float (toFloat x)
+
+
+maximum : Number -> Number -> Number
+maximum =
+    viaFloat2 max
+
+
+minimum : Number -> Number -> Number
+minimum =
+    viaFloat2 min
+
+
+viaFloat2 : (Float -> Float -> Float) -> Number -> Number -> Number
+viaFloat2 f x y =
+    fromFloat (f (toFloat x) (toFloat y))

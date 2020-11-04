@@ -1,4 +1,8 @@
-module Bartleby.Type.Transcript exposing (Transcript, decode, encode)
+module Bartleby.Type.Transcript exposing
+    ( Transcript
+    , decode
+    , encode
+    )
 
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -16,7 +20,7 @@ decode =
 
 
 encode : Transcript -> Encode.Value
-encode transcript =
+encode x =
     Encode.object
-        [ ( "transcript", Encode.string transcript.transcript )
+        [ ( "transcript", Encode.string x.transcript )
         ]
