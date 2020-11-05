@@ -3,13 +3,13 @@ module Bartleby.Utility.Encode exposing
     , viaString
     )
 
-import Bartleby.Utility.Maybe as Maybe
 import Json.Encode as Encode
+import Maybe.Extra as Maybe
 
 
 maybe : (a -> Encode.Value) -> Maybe a -> Encode.Value
 maybe =
-    Maybe.maybe Encode.null
+    Maybe.unwrap Encode.null
 
 
 {-| Encodes some value, then encodes the result as a string. This is useful to

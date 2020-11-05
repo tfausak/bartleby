@@ -14,7 +14,7 @@ import Bartleby.Type.SpeakerLabels as SpeakerLabels
 import Bartleby.Type.Transcript as Transcript
 import Bartleby.Type.Type as Type
 import Bartleby.Utility.List as List
-import Bartleby.Utility.Maybe as Maybe
+import Maybe.Extra as Maybe
 import Set
 
 
@@ -109,10 +109,19 @@ combineResultItems first second =
                 (\( x, y ) -> { x | content = x.content ++ y.content })
                 (List.cartesianProduct first.alternatives second.alternatives)
         , endTime =
-            Maybe.combineWith Number.maximum first.endTime second.endTime
+            combineWith Number.maximum first.endTime second.endTime
         , startTime =
-            Maybe.combineWith Number.minimum first.startTime second.startTime
+            combineWith Number.minimum first.startTime second.startTime
     }
+
+
+combineWith : (a -> a -> a) -> Maybe a -> Maybe a -> Maybe a
+combineWith f mx my =
+    Maybe.orList
+        [ Maybe.andThen2 (\x y -> Just (f x y)) mx my
+        , mx
+        , my
+        ]
 
 
 toResults : List Chunk -> Results.Results

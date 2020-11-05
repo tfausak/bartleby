@@ -5,12 +5,12 @@ import Bartleby.Type.FileData as FileData
 import Bartleby.Type.Message as Message
 import Bartleby.Type.Model as Model
 import Bartleby.Utility.List as List
-import Bartleby.Utility.Maybe as Maybe
 import Browser
 import Html
 import Html.Attributes as Attr
 import Html.Events as Event
 import Json.Decode as Decode
+import Maybe.Extra as Maybe
 
 
 view : Model.Model -> Browser.Document Message.Message
@@ -88,7 +88,7 @@ viewSide model =
             , Html.input
                 [ Attr.disabled (Maybe.isNothing maybeChunk)
                 , onInput Message.UpdateContent
-                , Attr.value (Maybe.maybe "" .content maybeChunk)
+                , Attr.value (Maybe.unwrap "" .content maybeChunk)
                 ]
                 []
             ]
@@ -102,7 +102,7 @@ viewSide model =
                 , Attr.step "0.1"
                 , Attr.type_ "number"
                 , Attr.value <|
-                    Maybe.maybe ""
+                    Maybe.unwrap ""
                         (\chunk -> String.fromFloat chunk.confidence)
                         maybeChunk
                 ]
@@ -118,7 +118,7 @@ viewSide model =
                 , Attr.step "0.1"
                 , Attr.type_ "number"
                 , Attr.value <|
-                    Maybe.maybe ""
+                    Maybe.unwrap ""
                         (\chunk -> String.fromFloat chunk.start)
                         maybeChunk
                 ]
@@ -134,7 +134,7 @@ viewSide model =
                 , Attr.step "0.1"
                 , Attr.type_ "number"
                 , Attr.value <|
-                    Maybe.maybe ""
+                    Maybe.unwrap ""
                         (\chunk -> String.fromFloat chunk.end)
                         maybeChunk
                 ]
