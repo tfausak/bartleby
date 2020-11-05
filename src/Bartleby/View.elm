@@ -4,6 +4,7 @@ import Bartleby.Type.Chunk as Chunk
 import Bartleby.Type.FileData as FileData
 import Bartleby.Type.Message as Message
 import Bartleby.Type.Model as Model
+import Bartleby.Utility.List as List
 import Browser
 import Html
 import Html.Attributes as Attr
@@ -19,15 +20,6 @@ view model =
         , Html.div []
             [ Html.button [ Html.onClick Message.JobRequested ]
                 [ Html.text "Select transcript" ]
-            , Html.button
-                [ case model.job of
-                    FileData.Loaded (Ok _) ->
-                        Html.onClick Message.DownloadJob
-
-                    _ ->
-                        Attr.disabled True
-                ]
-                [ Html.text "Download transcript" ]
             ]
         , viewJob model
         ]
@@ -55,16 +47,62 @@ viewJob model =
                         ]
 
                 Ok _ ->
-                    Html.p
-                        [ Attr.style "font-family" "sans-serif"
-                        , Attr.style "line-height" "1.5em"
-                        , Attr.style "padding" "1.5em"
+                    Html.div []
+                        [ Html.button [ Html.onClick Message.DownloadJob ]
+                            [ Html.text "Download transcript" ]
+                        , Html.div [] <|
+                            case model.index of
+                                Nothing ->
+                                    [ Html.text "Click on a word." ]
+
+                                Just index ->
+                                    case List.index index model.chunks of
+                                        Nothing ->
+                                            [ Html.text "Chunk not found!" ]
+
+                                        Just chunk ->
+                                            [ Html.text "content: "
+                                            , Html.input
+                                                [ Html.onInput Message.UpdateContent
+                                                , Attr.value chunk.content
+                                                ]
+                                                []
+                                            , Html.text " confidence: "
+                                            , Html.input
+                                                [ Attr.readonly True
+                                                , Attr.value (String.fromFloat chunk.confidence)
+                                                ]
+                                                []
+                                            , Html.text " start: "
+                                            , Html.input
+                                                [ Attr.readonly True
+                                                , Attr.value (String.fromFloat chunk.start)
+                                                ]
+                                                []
+                                            , Html.text " end: "
+                                            , Html.input
+                                                [ Attr.readonly True
+                                                , Attr.value (String.fromFloat chunk.end)
+                                                ]
+                                                []
+                                            , Html.text " speaker: "
+                                            , Html.input
+                                                [ Attr.readonly True
+                                                , Attr.value (Maybe.withDefault "unknown" chunk.speaker)
+                                                ]
+                                                []
+                                            ]
+                        , Html.p
+                            [ Attr.style "font-family" "sans-serif"
+                            , Attr.style "line-height" "1.5em"
+                            , Attr.style "padding" "0 1.5em 3em 1.5em"
+                            ]
+                            (List.concat (List.indexedMap viewChunk model.chunks))
                         ]
-                        (List.concatMap viewChunk model.chunks)
 
 
-viewChunk : Chunk.Chunk -> List (Html.Html Message.Message)
-viewChunk chunk =
+viewChunk : Int -> Chunk.Chunk -> List (Html.Html Message.Message)
+viewChunk index chunk =
     let
         backgroundColor =
             if chunk.confidence >= 1.0 then
@@ -100,19 +138,9 @@ viewChunk chunk =
                     "inherit"
     in
     [ Html.span
-        [ Attr.style "background-color" backgroundColor
+        [ Html.onClick (Message.SelectIndex index)
+        , Attr.style "background-color" backgroundColor
         , Attr.style "color" color
-        , Attr.title <|
-            String.join " "
-                [ "confidence:"
-                , String.fromFloat chunk.confidence
-                , "start:"
-                , String.fromFloat chunk.start
-                , "end:"
-                , String.fromFloat chunk.end
-                , "speaker:"
-                , Maybe.withDefault "unknown" chunk.speaker
-                ]
         ]
         [ Html.text chunk.content ]
     , Html.text " "

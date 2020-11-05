@@ -16,7 +16,7 @@ punctuation. If that is important to you, you'll have to use something else.
 - [x] Display speaker information somehow.
 - [x] Create maximal speaker label segments.
 - [x] Avoid defaulting times to zero (and other values). (Instead drop those items?)
-- [ ] Allow editing a single word at a time.
+- [x] Allow editing a single word at a time.
 - [ ] Delete a word.
 - [ ] Combine two words.
 - [ ] Split a word.

@@ -5,6 +5,7 @@ module Bartleby.Utility.List exposing
     , group
     , groupBy
     , groupOn
+    , index
     , span
     , takeWhile
     )
@@ -65,6 +66,20 @@ groupBy f xs =
 groupOn : (a -> b) -> List a -> List (List a)
 groupOn f =
     groupBy (\x y -> f x == f y)
+
+
+index : Int -> List a -> Maybe a
+index n xs =
+    case xs of
+        [] ->
+            Nothing
+
+        x :: ys ->
+            if n == 0 then
+                Just x
+
+            else
+                index (n - 1) ys
 
 
 span : (a -> Bool) -> List a -> ( List a, List a )

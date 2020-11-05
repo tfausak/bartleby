@@ -9,3 +9,5 @@ type Message
     | JobLoaded String
     | JobRequested
     | JobSelected File.File
+    | SelectIndex Int
+    | UpdateContent String

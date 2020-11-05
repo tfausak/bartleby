@@ -5,6 +5,7 @@ import Bartleby.Type.FileData as FileData
 import Bartleby.Type.Job as Job
 import Bartleby.Type.Message as Message
 import Bartleby.Type.Model as Model
+import Bartleby.Utility.List as List
 import File
 import File.Download as Download
 import File.Select as Select
@@ -46,6 +47,7 @@ update message model =
                         Ok job ->
                             { model
                                 | chunks = Chunk.fromResults job.results
+                                , index = Nothing
                                 , job = FileData.Loaded (Ok job)
                             }
             in
@@ -59,4 +61,30 @@ update message model =
         Message.JobSelected file ->
             ( { model | job = FileData.Selected file }
             , Task.perform Message.JobLoaded (File.toString file)
+            )
+
+        Message.SelectIndex index ->
+            ( { model | index = Just index }
+            , Cmd.none
+            )
+
+        Message.UpdateContent content ->
+            ( case model.index of
+                Nothing ->
+                    model
+
+                Just index ->
+                    { model
+                        | chunks =
+                            List.indexedMap
+                                (\i chunk ->
+                                    if i == index then
+                                        { chunk | content = content }
+
+                                    else
+                                        chunk
+                                )
+                                model.chunks
+                    }
+            , Cmd.none
             )

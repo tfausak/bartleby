@@ -12,5 +12,6 @@ around for its metadata.
 -}
 type alias Model =
     { chunks : List Chunk.Chunk
+    , index : Maybe Int
     , job : FileData.FileData (Result Decode.Error Job.Job)
     }
