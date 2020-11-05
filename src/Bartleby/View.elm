@@ -108,6 +108,10 @@ viewJob model =
                                             , Html.button
                                                 [ Html.onClick (Message.RemoveChunk index) ]
                                                 [ Html.text "Remove" ]
+                                            , Html.text " "
+                                            , Html.button
+                                                [ Html.onClick (Message.SplitChunk index) ]
+                                                [ Html.text "Split" ]
                                             ]
                         , Html.p
                             [ Attr.style "font-family" "sans-serif"

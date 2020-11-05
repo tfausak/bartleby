@@ -11,6 +11,7 @@ type Message
     | JobSelected File.File
     | RemoveChunk Int
     | SelectIndex Int
+    | SplitChunk Int
     | UpdateConfidence Int String
     | UpdateContent Int String
     | UpdateEnd Int String

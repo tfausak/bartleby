@@ -5,6 +5,7 @@ import Bartleby.Type.FileData as FileData
 import Bartleby.Type.Job as Job
 import Bartleby.Type.Message as Message
 import Bartleby.Type.Model as Model
+import Bartleby.Type.Results as Results
 import Bartleby.Utility.List as List
 import File
 import File.Download as Download
@@ -48,7 +49,7 @@ update message model =
                             { model
                                 | chunks = Chunk.fromResults job.results
                                 , index = Nothing
-                                , job = FileData.Loaded (Ok job)
+                                , job = FileData.Loaded (Ok { job | results = Results.empty })
                             }
             in
             ( newModel, Cmd.none )
@@ -76,28 +77,26 @@ update message model =
             , Cmd.none
             )
 
+        Message.SplitChunk index ->
+            ( { model
+                | chunks = splitAt index model.chunks
+                , index = Just (index + 1)
+              }
+            , Cmd.none
+            )
+
         Message.UpdateConfidence index string ->
             ( case String.toFloat string of
                 Nothing ->
                     model
 
                 Just confidence ->
-                    { model
-                        | chunks =
-                            List.updateAt index
-                                (\chunk -> { chunk | confidence = confidence })
-                                model.chunks
-                    }
+                    updateAt model index (\x -> { x | confidence = confidence })
             , Cmd.none
             )
 
         Message.UpdateContent index content ->
-            ( { model
-                | chunks =
-                    List.updateAt index
-                        (\chunk -> { chunk | content = content })
-                        model.chunks
-              }
+            ( updateAt model index (\x -> { x | content = content })
             , Cmd.none
             )
 
@@ -107,22 +106,12 @@ update message model =
                     model
 
                 Just end ->
-                    { model
-                        | chunks =
-                            List.updateAt index
-                                (\chunk -> { chunk | end = end })
-                                model.chunks
-                    }
+                    updateAt model index (\x -> { x | end = end })
             , Cmd.none
             )
 
         Message.UpdateSpeaker index speaker ->
-            ( { model
-                | chunks =
-                    List.updateAt index
-                        (\chunk -> { chunk | speaker = Just speaker })
-                        model.chunks
-              }
+            ( updateAt model index (\x -> { x | speaker = Just speaker })
             , Cmd.none
             )
 
@@ -132,11 +121,34 @@ update message model =
                     model
 
                 Just start ->
-                    { model
-                        | chunks =
-                            List.updateAt index
-                                (\chunk -> { chunk | start = start })
-                                model.chunks
-                    }
+                    updateAt model index (\x -> { x | start = start })
             , Cmd.none
             )
+
+
+updateAt : Model.Model -> Int -> (Chunk.Chunk -> Chunk.Chunk) -> Model.Model
+updateAt model n f =
+    { model | chunks = List.updateAt n f model.chunks }
+
+
+splitAt : Int -> List Chunk.Chunk -> List Chunk.Chunk
+splitAt index chunks =
+    case chunks of
+        [] ->
+            []
+
+        chunk :: rest ->
+            if index == 0 then
+                let
+                    duration =
+                        chunk.end - chunk.start
+
+                    midpoint =
+                        chunk.start + duration / 2
+                in
+                { chunk | end = midpoint }
+                    :: { chunk | content = "?", start = midpoint }
+                    :: rest
+
+            else
+                chunk :: splitAt (index - 1) rest

@@ -1,6 +1,7 @@
 module Bartleby.Type.Results exposing
     ( Results
     , decode
+    , empty
     , encode
     )
 
@@ -19,6 +20,14 @@ type alias Results =
     { items : List ResultItem.ResultItem
     , speakerLabels : Maybe SpeakerLabels.SpeakerLabels
     , transcripts : List Transcript.Transcript
+    }
+
+
+empty : Results
+empty =
+    { items = []
+    , speakerLabels = Nothing
+    , transcripts = []
     }
 
 

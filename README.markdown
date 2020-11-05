@@ -19,8 +19,8 @@ punctuation. If that is important to you, you'll have to use something else.
 - [x] Allow editing a single word at a time.
 - [x] Allow changing speaker names.
 - [x] Delete a word.
+- [x] Split a word.
 - [ ] Combine two words.
-- [ ] Split a word.
 - [ ] Improve performance of speaker identification.
 - [ ] Handle more speakers.
 - [ ] Come up with better internal representation of job and chunks.
