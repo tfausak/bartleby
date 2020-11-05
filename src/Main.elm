@@ -26,7 +26,7 @@ init _ =
       , index = Nothing
       , job = FileData.NotAsked
       }
-    , Task.perform identity (Task.succeed Message.DoNothing)
+    , Task.perform identity (Task.succeed Message.Ignore)
     )
 
 

@@ -18,11 +18,6 @@ import Task
 update : Message.Message -> Model.Model -> ( Model.Model, Cmd Message.Message )
 update message model =
     case message of
-        Message.DoNothing ->
-            ( model
-            , Cmd.none
-            )
-
         Message.DownloadJob ->
             ( model
             , case model.job of
@@ -38,21 +33,21 @@ update message model =
                     Cmd.none
             )
 
-        Message.JobLoaded string ->
-            let
-                newModel =
-                    case Decode.decodeString Job.decode string of
-                        Err err ->
-                            { model | job = FileData.Loaded (Err err) }
+        Message.Ignore ->
+            pure model
 
-                        Ok job ->
-                            { model
-                                | chunks = Chunk.fromResults job.results
-                                , index = Nothing
-                                , job = FileData.Loaded (Ok { job | results = Results.empty })
-                            }
-            in
-            ( newModel, Cmd.none )
+        Message.JobLoaded string ->
+            pure <|
+                case Decode.decodeString Job.decode string of
+                    Err err ->
+                        { model | job = FileData.Loaded (Err err) }
+
+                    Ok job ->
+                        { model
+                            | chunks = Chunk.fromResults job.results
+                            , index = Nothing
+                            , job = FileData.Loaded (Ok { job | results = Results.empty })
+                        }
 
         Message.JobRequested ->
             ( { model | job = FileData.Requested }
@@ -65,70 +60,58 @@ update message model =
             )
 
         Message.MergeChunk index ->
-            ( { model | chunks = mergeAt index model.chunks }
-            , Cmd.none
-            )
+            pure { model | chunks = mergeAt index model.chunks }
 
         Message.RemoveChunk index ->
-            ( { model
-                | chunks = List.removeAt index model.chunks
-                , index = Nothing
-              }
-            , Cmd.none
-            )
+            pure { model | chunks = List.removeAt index model.chunks }
 
         Message.SelectIndex index ->
-            ( { model | index = Just index }
-            , Cmd.none
-            )
+            pure { model | index = Just index }
 
         Message.SplitChunk index ->
-            ( { model
-                | chunks = splitAt index model.chunks
-                , index = Just (index + 1)
-              }
-            , Cmd.none
-            )
+            pure
+                { model
+                    | chunks = splitAt index model.chunks
+                    , index = Just (index + 1)
+                }
 
         Message.UpdateConfidence index string ->
-            ( case String.toFloat string of
-                Nothing ->
-                    model
+            pure <|
+                case String.toFloat string of
+                    Nothing ->
+                        model
 
-                Just confidence ->
-                    updateAt model index (\x -> { x | confidence = confidence })
-            , Cmd.none
-            )
+                    Just confidence ->
+                        updateAt model index (\chunk -> { chunk | confidence = confidence })
 
         Message.UpdateContent index content ->
-            ( updateAt model index (\x -> { x | content = content })
-            , Cmd.none
-            )
+            pure (updateAt model index (\chunk -> { chunk | content = content }))
 
         Message.UpdateEnd index string ->
-            ( case String.toFloat string of
-                Nothing ->
-                    model
+            pure <|
+                case String.toFloat string of
+                    Nothing ->
+                        model
 
-                Just end ->
-                    updateAt model index (\x -> { x | end = end })
-            , Cmd.none
-            )
+                    Just end ->
+                        updateAt model index (\chunk -> { chunk | end = end })
 
         Message.UpdateSpeaker index speaker ->
-            ( updateAt model index (\x -> { x | speaker = Just speaker })
-            , Cmd.none
-            )
+            pure (updateAt model index (\chunk -> { chunk | speaker = Just speaker }))
 
         Message.UpdateStart index string ->
-            ( case String.toFloat string of
-                Nothing ->
-                    model
+            pure <|
+                case String.toFloat string of
+                    Nothing ->
+                        model
 
-                Just start ->
-                    updateAt model index (\x -> { x | start = start })
-            , Cmd.none
-            )
+                    Just start ->
+                        updateAt model index (\chunk -> { chunk | start = start })
+
+
+pure : model -> ( model, Cmd.Cmd message )
+pure model =
+    ( model, Cmd.none )
 
 
 mergeAt : Int -> List Chunk.Chunk -> List Chunk.Chunk

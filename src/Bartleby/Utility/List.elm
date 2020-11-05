@@ -10,6 +10,7 @@ module Bartleby.Utility.List exposing
     , span
     , takeWhile
     , updateAt
+    , withIndex
     )
 
 
@@ -129,3 +130,8 @@ updateAt n f xs =
 
             else
                 x :: updateAt (n - 1) f ys
+
+
+withIndex : List a -> List ( Int, a )
+withIndex =
+    List.indexedMap Tuple.pair

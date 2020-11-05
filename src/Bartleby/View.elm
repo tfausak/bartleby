@@ -5,10 +5,11 @@ import Bartleby.Type.FileData as FileData
 import Bartleby.Type.Message as Message
 import Bartleby.Type.Model as Model
 import Bartleby.Utility.List as List
+import Bartleby.Utility.Maybe as Maybe
 import Browser
 import Html
 import Html.Attributes as Attr
-import Html.Events as Html
+import Html.Events as Event
 import Json.Decode as Decode
 
 
@@ -16,118 +17,194 @@ view : Model.Model -> Browser.Document Message.Message
 view model =
     { title = "Bartleby"
     , body =
-        [ Html.h1 [] [ Html.text "Bartleby" ]
-        , Html.div []
-            [ Html.button [ Html.onClick Message.JobRequested ]
-                [ Html.text "Select transcript" ]
+        [ Html.div
+            [ Attr.style "left" "0"
+            , Attr.style "position" "fixed"
+            , Attr.style "top" "0"
+            , Attr.style "width" "20em"
             ]
-        , viewJob model
+            (viewSide model)
+        , Html.div
+            [ Attr.style "font-family" "sans-serif"
+            , Attr.style "line-height" "1.5em"
+            , Attr.style "margin-left" "20em"
+            ]
+            (viewMain model)
         ]
     }
 
 
-viewJob : Model.Model -> Html.Html Message.Message
-viewJob model =
+viewSide : Model.Model -> List (Html.Html Message.Message)
+viewSide model =
+    let
+        hasJob =
+            case model.job of
+                FileData.Loaded (Ok _) ->
+                    True
+
+                _ ->
+                    False
+
+        maybeChunk =
+            Maybe.andThen (\index -> List.index index model.chunks) model.index
+
+        onClick message =
+            Event.onClick <|
+                case model.index of
+                    Nothing ->
+                        Message.Ignore
+
+                    Just index ->
+                        message index
+
+        onInput message =
+            Event.onInput <|
+                \string ->
+                    case model.index of
+                        Nothing ->
+                            Message.Ignore
+
+                        Just index ->
+                            message index string
+    in
+    [ Html.h1 [] [ Html.text "Bartleby" ]
+    , Html.ul []
+        [ Html.li []
+            [ Html.button
+                [ Event.onClick Message.JobRequested ]
+                [ Html.text "Select transcript" ]
+            ]
+        , Html.li []
+            [ Html.button
+                [ Attr.disabled (not hasJob)
+                , Event.onClick Message.DownloadJob
+                ]
+                [ Html.text "Download transcript" ]
+            ]
+        ]
+    , Html.ul []
+        [ Html.li []
+            [ Html.text "Content: "
+            , Html.input
+                [ Attr.disabled (Maybe.isNothing maybeChunk)
+                , onInput Message.UpdateContent
+                , Attr.value (Maybe.maybe "" .content maybeChunk)
+                ]
+                []
+            ]
+        , Html.li []
+            [ Html.text "Confidence: "
+            , Html.input
+                [ Attr.disabled (Maybe.isNothing maybeChunk)
+                , onInput Message.UpdateConfidence
+                , Attr.max "1"
+                , Attr.min "0"
+                , Attr.step "0.1"
+                , Attr.type_ "number"
+                , Attr.value <|
+                    Maybe.maybe ""
+                        (\chunk -> String.fromFloat chunk.confidence)
+                        maybeChunk
+                ]
+                []
+            ]
+        , Html.li []
+            [ Html.text "Start: "
+            , Html.input
+                [ Attr.disabled (Maybe.isNothing maybeChunk)
+                , onInput Message.UpdateStart
+                , Attr.max "1"
+                , Attr.min "0"
+                , Attr.step "0.1"
+                , Attr.type_ "number"
+                , Attr.value <|
+                    Maybe.maybe ""
+                        (\chunk -> String.fromFloat chunk.start)
+                        maybeChunk
+                ]
+                []
+            ]
+        , Html.li []
+            [ Html.text "End: "
+            , Html.input
+                [ Attr.disabled (Maybe.isNothing maybeChunk)
+                , onInput Message.UpdateEnd
+                , Attr.max "1"
+                , Attr.min "0"
+                , Attr.step "0.1"
+                , Attr.type_ "number"
+                , Attr.value <|
+                    Maybe.maybe ""
+                        (\chunk -> String.fromFloat chunk.end)
+                        maybeChunk
+                ]
+                []
+            ]
+        , Html.li []
+            [ Html.text "Speaker: "
+            , Html.input
+                [ Attr.disabled (Maybe.isNothing maybeChunk)
+                , onInput Message.UpdateSpeaker
+                , Attr.value (Maybe.withDefault "" (Maybe.andThen .speaker maybeChunk))
+                ]
+                []
+            ]
+        , Html.li []
+            [ Html.button
+                [ Attr.disabled (Maybe.isNothing maybeChunk)
+                , onClick Message.RemoveChunk
+                ]
+                [ Html.text "Remove word" ]
+            ]
+        , Html.li []
+            [ Html.button
+                [ Attr.disabled (Maybe.isNothing maybeChunk)
+                , onClick Message.SplitChunk
+                ]
+                [ Html.text "Split word" ]
+            ]
+        , Html.li []
+            [ Html.button
+                [ Attr.disabled (Maybe.isNothing maybeChunk)
+                , onClick Message.MergeChunk
+                ]
+                [ Html.text "Merge word" ]
+            ]
+        ]
+    ]
+
+
+viewMain : Model.Model -> List (Html.Html Message.Message)
+viewMain model =
     case model.job of
         FileData.NotAsked ->
-            Html.p [] [ Html.text "Click the button." ]
+            [ Html.p [] [ Html.text "Please select a transcript." ] ]
 
         FileData.Requested ->
-            Html.p [] [ Html.text "Selecting a file ..." ]
+            [ Html.p [] [ Html.text "Selecting a transcript ..." ] ]
 
         FileData.Selected _ ->
-            Html.p [] [ Html.text "Loading the file ..." ]
+            [ Html.p [] [ Html.text "Loading the transcript ..." ] ]
 
-        FileData.Loaded result ->
-            case result of
-                Err err ->
-                    Html.div []
-                        [ Html.p [] [ Html.text "Failed to parse transcript!" ]
-                        , Html.pre [] [ Html.text (Decode.errorToString err) ]
-                        ]
+        FileData.Loaded (Err err) ->
+            [ Html.p [] [ Html.text "Failed to load transcript!" ]
+            , Html.pre [] [ Html.text (Decode.errorToString err) ]
+            ]
 
-                Ok _ ->
-                    Html.div []
-                        [ Html.button [ Html.onClick Message.DownloadJob ]
-                            [ Html.text "Download transcript" ]
-                        , Html.div [] <|
-                            case model.index of
-                                Nothing ->
-                                    [ Html.text "Click on a word." ]
-
-                                Just index ->
-                                    case List.index index model.chunks of
-                                        Nothing ->
-                                            [ Html.text "Chunk not found!" ]
-
-                                        Just chunk ->
-                                            [ Html.text "content: "
-                                            , Html.input
-                                                [ Html.onInput (Message.UpdateContent index)
-                                                , Attr.value chunk.content
-                                                ]
-                                                []
-                                            , Html.text " confidence: "
-                                            , Html.input
-                                                [ Html.onInput (Message.UpdateConfidence index)
-                                                , Attr.max "1"
-                                                , Attr.min "0"
-                                                , Attr.step "0.1"
-                                                , Attr.style "width" "5em"
-                                                , Attr.type_ "number"
-                                                , Attr.value (String.fromFloat chunk.confidence)
-                                                ]
-                                                []
-                                            , Html.text " start: "
-                                            , Html.input
-                                                [ Html.onInput (Message.UpdateStart index)
-                                                , Attr.min "0"
-                                                , Attr.step "0.1"
-                                                , Attr.style "width" "5em"
-                                                , Attr.type_ "number"
-                                                , Attr.value (String.fromFloat chunk.start)
-                                                ]
-                                                []
-                                            , Html.text " end: "
-                                            , Html.input
-                                                [ Html.onInput (Message.UpdateEnd index)
-                                                , Attr.min "0"
-                                                , Attr.step "0.1"
-                                                , Attr.style "width" "5em"
-                                                , Attr.type_ "number"
-                                                , Attr.value (String.fromFloat chunk.end)
-                                                ]
-                                                []
-                                            , Html.text " speaker: "
-                                            , Html.input
-                                                [ Html.onInput (Message.UpdateSpeaker index)
-                                                , Attr.value (Maybe.withDefault "unknown" chunk.speaker)
-                                                ]
-                                                []
-                                            , Html.text " "
-                                            , Html.button
-                                                [ Html.onClick (Message.RemoveChunk index) ]
-                                                [ Html.text "Remove" ]
-                                            , Html.text " "
-                                            , Html.button
-                                                [ Html.onClick (Message.SplitChunk index) ]
-                                                [ Html.text "Split" ]
-                                            , Html.text " "
-                                            , Html.button
-                                                [ Html.onClick (Message.MergeChunk index) ]
-                                                [ Html.text "Merge" ]
-                                            ]
-                        , Html.p
-                            [ Attr.style "font-family" "sans-serif"
-                            , Attr.style "line-height" "1.5em"
-                            , Attr.style "padding" "0 1.5em 3em 1.5em"
-                            ]
-                            (List.concat (List.indexedMap viewChunk model.chunks))
-                        ]
+        FileData.Loaded (Ok _) ->
+            model.chunks
+                |> List.withIndex
+                |> List.groupOn (\( _, chunk ) -> chunk.speaker)
+                |> List.map (viewChunks model.index)
 
 
-viewChunk : Int -> Chunk.Chunk -> List (Html.Html Message.Message)
-viewChunk index chunk =
+viewChunks : Maybe Int -> List ( Int, Chunk.Chunk ) -> Html.Html Message.Message
+viewChunks maybeIndex chunks =
+    Html.p [] (List.concatMap (viewChunk maybeIndex) chunks)
+
+
+viewChunk : Maybe Int -> ( Int, Chunk.Chunk ) -> List (Html.Html Message.Message)
+viewChunk maybeIndex ( index, chunk ) =
     let
         backgroundColor =
             if chunk.confidence >= 1.0 then
@@ -161,12 +238,21 @@ viewChunk index chunk =
 
                 _ ->
                     "inherit"
+
+        textDecoration =
+            if Just index == maybeIndex then
+                "underline"
+
+            else
+                "inherit"
     in
     [ Html.span
-        [ Html.onClick (Message.SelectIndex index)
+        [ Event.onClick (Message.SelectIndex index)
         , Attr.style "background-color" backgroundColor
         , Attr.style "color" color
+        , Attr.style "text-decoration" textDecoration
         ]
-        [ Html.text chunk.content ]
+        [ Html.text chunk.content
+        ]
     , Html.text " "
     ]

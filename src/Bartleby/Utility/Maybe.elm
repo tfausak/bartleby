@@ -1,5 +1,7 @@
 module Bartleby.Utility.Maybe exposing
     ( combineWith
+    , isJust
+    , isNothing
     , maybe
     , toList
     )
@@ -19,6 +21,16 @@ combineWith f mx my =
 
         ( Nothing, Nothing ) ->
             Nothing
+
+
+isJust : Maybe a -> Bool
+isJust m =
+    not (isNothing m)
+
+
+isNothing : Maybe a -> Bool
+isNothing =
+    maybe True (always False)
 
 
 maybe : b -> (a -> b) -> Maybe a -> b

@@ -4,8 +4,8 @@ import File
 
 
 type Message
-    = DoNothing
-    | DownloadJob
+    = DownloadJob
+    | Ignore
     | JobLoaded String
     | JobRequested
     | JobSelected File.File
