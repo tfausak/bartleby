@@ -97,7 +97,17 @@ update message model =
                         updateAt model index (\chunk -> { chunk | end = end })
 
         Message.UpdateSpeaker index speaker ->
-            pure (updateAt model index (\chunk -> { chunk | speaker = Just speaker }))
+            pure <|
+                updateAt model index <|
+                    \chunk ->
+                        { chunk
+                            | speaker =
+                                if String.isEmpty speaker then
+                                    Nothing
+
+                                else
+                                    Just speaker
+                        }
 
         Message.UpdateStart index string ->
             pure <|

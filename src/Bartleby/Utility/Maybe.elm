@@ -6,6 +6,8 @@ module Bartleby.Utility.Maybe exposing
     , toList
     )
 
+import Maybe.Extra as Extra
+
 
 combineWith : (a -> a -> a) -> Maybe a -> Maybe a -> Maybe a
 combineWith f mx my =
@@ -24,25 +26,20 @@ combineWith f mx my =
 
 
 isJust : Maybe a -> Bool
-isJust m =
-    not (isNothing m)
+isJust =
+    Extra.isJust
 
 
 isNothing : Maybe a -> Bool
 isNothing =
-    maybe True (always False)
+    Extra.isNothing
 
 
 maybe : b -> (a -> b) -> Maybe a -> b
-maybe d f m =
-    case m of
-        Nothing ->
-            d
-
-        Just x ->
-            f x
+maybe =
+    Extra.unwrap
 
 
 toList : Maybe a -> List a
 toList =
-    maybe [] List.singleton
+    Extra.toList
