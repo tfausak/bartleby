@@ -112,6 +112,10 @@ viewJob model =
                                             , Html.button
                                                 [ Html.onClick (Message.SplitChunk index) ]
                                                 [ Html.text "Split" ]
+                                            , Html.text " "
+                                            , Html.button
+                                                [ Html.onClick (Message.MergeChunk index) ]
+                                                [ Html.text "Merge" ]
                                             ]
                         , Html.p
                             [ Attr.style "font-family" "sans-serif"

@@ -9,6 +9,7 @@ type Message
     | JobLoaded String
     | JobRequested
     | JobSelected File.File
+    | MergeChunk Int
     | RemoveChunk Int
     | SelectIndex Int
     | SplitChunk Int

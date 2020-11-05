@@ -64,6 +64,11 @@ update message model =
             , Task.perform Message.JobLoaded (File.toString file)
             )
 
+        Message.MergeChunk index ->
+            ( { model | chunks = mergeAt index model.chunks }
+            , Cmd.none
+            )
+
         Message.RemoveChunk index ->
             ( { model
                 | chunks = List.removeAt index model.chunks
@@ -124,6 +129,24 @@ update message model =
                     updateAt model index (\x -> { x | start = start })
             , Cmd.none
             )
+
+
+mergeAt : Int -> List Chunk.Chunk -> List Chunk.Chunk
+mergeAt index chunks =
+    case chunks of
+        first :: second :: rest ->
+            if index == 0 then
+                { first
+                    | content = first.content ++ " " ++ second.content
+                    , end = second.end
+                }
+                    :: rest
+
+            else
+                first :: mergeAt (index - 1) (second :: rest)
+
+        _ ->
+            chunks
 
 
 updateAt : Model.Model -> Int -> (Chunk.Chunk -> Chunk.Chunk) -> Model.Model
