@@ -6,12 +6,12 @@ import Bartleby.Type.Job as Job
 import Bartleby.Type.Message as Message
 import Bartleby.Type.Model as Model
 import Bartleby.Type.Results as Results
-import Bartleby.Utility.List as List
 import File
 import File.Download as Download
 import File.Select as Select
 import Json.Decode as Decode
 import Json.Encode as Encode
+import List.Extra as List
 import Task
 
 

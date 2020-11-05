@@ -10,6 +10,7 @@ import Html
 import Html.Attributes as Attr
 import Html.Events as Event
 import Json.Decode as Decode
+import List.Extra as List
 import Maybe.Extra as Maybe
 
 
@@ -46,7 +47,7 @@ viewSide model =
                     False
 
         maybeChunk =
-            Maybe.andThen (\index -> List.index index model.chunks) model.index
+            Maybe.andThen (\index -> List.getAt index model.chunks) model.index
 
         onClick message =
             Event.onClick <|

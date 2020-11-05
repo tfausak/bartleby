@@ -14,6 +14,7 @@ import Bartleby.Type.SpeakerLabels as SpeakerLabels
 import Bartleby.Type.Transcript as Transcript
 import Bartleby.Type.Type as Type
 import Bartleby.Utility.List as List
+import List.Extra as List
 import Maybe.Extra as Maybe
 import Set
 
@@ -107,7 +108,7 @@ combineResultItems first second =
         | alternatives =
             List.map
                 (\( x, y ) -> { x | content = x.content ++ y.content })
-                (List.cartesianProduct first.alternatives second.alternatives)
+                (List.cartesianSquare first.alternatives second.alternatives)
         , endTime =
             combineWith Number.maximum first.endTime second.endTime
         , startTime =
