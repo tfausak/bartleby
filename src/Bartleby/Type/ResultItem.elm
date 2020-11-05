@@ -7,9 +7,9 @@ module Bartleby.Type.ResultItem exposing
 import Bartleby.Type.Alternative as Alternative
 import Bartleby.Type.Number as Number
 import Bartleby.Type.Type as Type
-import Bartleby.Utility.Encode as Encode
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Json.Encode.Extra as Encode
 
 
 type alias ResultItem =

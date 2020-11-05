@@ -8,9 +8,9 @@ module Bartleby.Type.Results exposing
 import Bartleby.Type.ResultItem as ResultItem
 import Bartleby.Type.SpeakerLabels as SpeakerLabels
 import Bartleby.Type.Transcript as Transcript
-import Bartleby.Utility.Encode as Encode
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Json.Encode.Extra as Encode
 
 
 {-| This has a list of transcripts, but that list usually only has one

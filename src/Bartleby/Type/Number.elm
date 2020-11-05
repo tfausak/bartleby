@@ -8,10 +8,11 @@ module Bartleby.Type.Number exposing
     , toFloat
     )
 
-import Bartleby.Utility.Decode as Decode
 import Bartleby.Utility.Encode as Encode
 import Json.Decode as Decode
+import Json.Decode.Extra as Decode
 import Json.Encode as Encode
+import Json.Encode.Extra as Encode
 
 
 {-| This is just a thin wrapper around a float. It's necessary because the job
@@ -33,12 +34,12 @@ toFloat (Number x) =
 
 decode : Decode.Decoder Number
 decode =
-    Decode.map fromFloat (Decode.viaString Decode.float)
+    Decode.map fromFloat Decode.parseFloat
 
 
 encode : Number -> Encode.Value
 encode x =
-    Encode.viaString Encode.float (toFloat x)
+    Encode.renderFloat (toFloat x)
 
 
 maximum : Number -> Number -> Number
