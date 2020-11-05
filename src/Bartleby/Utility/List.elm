@@ -8,6 +8,7 @@ module Bartleby.Utility.List exposing
     , index
     , span
     , takeWhile
+    , updateAt
     )
 
 
@@ -99,3 +100,15 @@ takeWhile f xs =
 
             else
                 []
+
+
+updateAt : Int -> (a -> a) -> List a -> List a
+updateAt n f =
+    List.indexedMap
+        (\i x ->
+            if i == n then
+                f x
+
+            else
+                x
+        )

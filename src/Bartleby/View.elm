@@ -69,25 +69,38 @@ viewJob model =
                                                 []
                                             , Html.text " confidence: "
                                             , Html.input
-                                                [ Attr.readonly True
+                                                [ Html.onInput Message.UpdateConfidence
+                                                , Attr.max "1"
+                                                , Attr.min "0"
+                                                , Attr.step "0.1"
+                                                , Attr.style "width" "5em"
+                                                , Attr.type_ "number"
                                                 , Attr.value (String.fromFloat chunk.confidence)
                                                 ]
                                                 []
                                             , Html.text " start: "
                                             , Html.input
-                                                [ Attr.readonly True
+                                                [ Html.onInput Message.UpdateStart
+                                                , Attr.min "0"
+                                                , Attr.step "0.1"
+                                                , Attr.style "width" "5em"
+                                                , Attr.type_ "number"
                                                 , Attr.value (String.fromFloat chunk.start)
                                                 ]
                                                 []
                                             , Html.text " end: "
                                             , Html.input
-                                                [ Attr.readonly True
+                                                [ Html.onInput Message.UpdateEnd
+                                                , Attr.min "0"
+                                                , Attr.step "0.1"
+                                                , Attr.style "width" "5em"
+                                                , Attr.type_ "number"
                                                 , Attr.value (String.fromFloat chunk.end)
                                                 ]
                                                 []
                                             , Html.text " speaker: "
                                             , Html.input
-                                                [ Attr.readonly True
+                                                [ Html.onInput Message.UpdateSpeaker
                                                 , Attr.value (Maybe.withDefault "unknown" chunk.speaker)
                                                 ]
                                                 []

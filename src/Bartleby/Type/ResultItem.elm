@@ -16,7 +16,7 @@ type alias ResultItem =
     { alternatives : List Alternative.Alternative
     , endTime : Maybe Number.Number
     , startTime : Maybe Number.Number
-    , tipe : Type.Type
+    , type_ : Type.Type
     }
 
 
@@ -35,5 +35,5 @@ encode x =
         [ ( "alternatives", Encode.list Alternative.encode x.alternatives )
         , ( "end_time", Encode.maybe Number.encode x.endTime )
         , ( "start_time", Encode.maybe Number.encode x.startTime )
-        , ( "type", Type.encode x.tipe )
+        , ( "type", Type.encode x.type_ )
         ]

@@ -53,7 +53,7 @@ fromResultItems segmentItems resultItems =
             Maybe.toList (fromResultItem segmentItems resultItem)
 
         first :: second :: rest ->
-            case second.tipe of
+            case second.type_ of
                 Type.Pronunciation ->
                     List.append
                         (Maybe.toList (fromResultItem segmentItems first))
@@ -128,7 +128,7 @@ toResultItem chunk =
     { alternatives = [ toAlternative chunk ]
     , endTime = Just (Number.fromFloat chunk.end)
     , startTime = Just (Number.fromFloat chunk.start)
-    , tipe = Type.Pronunciation
+    , type_ = Type.Pronunciation
     }
 
 

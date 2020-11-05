@@ -68,6 +68,26 @@ update message model =
             , Cmd.none
             )
 
+        Message.UpdateConfidence string ->
+            ( case String.toFloat string of
+                Nothing ->
+                    model
+
+                Just confidence ->
+                    case model.index of
+                        Nothing ->
+                            model
+
+                        Just index ->
+                            { model
+                                | chunks =
+                                    List.updateAt index
+                                        (\x -> { x | confidence = confidence })
+                                        model.chunks
+                            }
+            , Cmd.none
+            )
+
         Message.UpdateContent content ->
             ( case model.index of
                 Nothing ->
@@ -76,15 +96,64 @@ update message model =
                 Just index ->
                     { model
                         | chunks =
-                            List.indexedMap
-                                (\i chunk ->
-                                    if i == index then
-                                        { chunk | content = content }
-
-                                    else
-                                        chunk
-                                )
+                            List.updateAt index
+                                (\chunk -> { chunk | content = content })
                                 model.chunks
                     }
+            , Cmd.none
+            )
+
+        Message.UpdateEnd string ->
+            ( case String.toFloat string of
+                Nothing ->
+                    model
+
+                Just end ->
+                    case model.index of
+                        Nothing ->
+                            model
+
+                        Just index ->
+                            { model
+                                | chunks =
+                                    List.updateAt index
+                                        (\x -> { x | end = end })
+                                        model.chunks
+                            }
+            , Cmd.none
+            )
+
+        Message.UpdateSpeaker speaker ->
+            ( case model.index of
+                Nothing ->
+                    model
+
+                Just index ->
+                    { model
+                        | chunks =
+                            List.updateAt index
+                                (\chunk -> { chunk | speaker = Just speaker })
+                                model.chunks
+                    }
+            , Cmd.none
+            )
+
+        Message.UpdateStart string ->
+            ( case String.toFloat string of
+                Nothing ->
+                    model
+
+                Just start ->
+                    case model.index of
+                        Nothing ->
+                            model
+
+                        Just index ->
+                            { model
+                                | chunks =
+                                    List.updateAt index
+                                        (\x -> { x | start = start })
+                                        model.chunks
+                            }
             , Cmd.none
             )

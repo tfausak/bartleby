@@ -10,4 +10,8 @@ type Message
     | JobRequested
     | JobSelected File.File
     | SelectIndex Int
+    | UpdateConfidence String
     | UpdateContent String
+    | UpdateEnd String
+    | UpdateSpeaker String
+    | UpdateStart String

@@ -43,8 +43,8 @@ decode =
     Decode.andThen
         (\string ->
             case fromString string of
-                Just tipe ->
-                    Decode.succeed tipe
+                Just type_ ->
+                    Decode.succeed type_
 
                 Nothing ->
                     Decode.fail ("unknown type: " ++ string)
