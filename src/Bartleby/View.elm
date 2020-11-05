@@ -63,13 +63,13 @@ viewJob model =
                                         Just chunk ->
                                             [ Html.text "content: "
                                             , Html.input
-                                                [ Html.onInput Message.UpdateContent
+                                                [ Html.onInput (Message.UpdateContent index)
                                                 , Attr.value chunk.content
                                                 ]
                                                 []
                                             , Html.text " confidence: "
                                             , Html.input
-                                                [ Html.onInput Message.UpdateConfidence
+                                                [ Html.onInput (Message.UpdateConfidence index)
                                                 , Attr.max "1"
                                                 , Attr.min "0"
                                                 , Attr.step "0.1"
@@ -80,7 +80,7 @@ viewJob model =
                                                 []
                                             , Html.text " start: "
                                             , Html.input
-                                                [ Html.onInput Message.UpdateStart
+                                                [ Html.onInput (Message.UpdateStart index)
                                                 , Attr.min "0"
                                                 , Attr.step "0.1"
                                                 , Attr.style "width" "5em"
@@ -90,7 +90,7 @@ viewJob model =
                                                 []
                                             , Html.text " end: "
                                             , Html.input
-                                                [ Html.onInput Message.UpdateEnd
+                                                [ Html.onInput (Message.UpdateEnd index)
                                                 , Attr.min "0"
                                                 , Attr.step "0.1"
                                                 , Attr.style "width" "5em"
@@ -100,10 +100,14 @@ viewJob model =
                                                 []
                                             , Html.text " speaker: "
                                             , Html.input
-                                                [ Html.onInput Message.UpdateSpeaker
+                                                [ Html.onInput (Message.UpdateSpeaker index)
                                                 , Attr.value (Maybe.withDefault "unknown" chunk.speaker)
                                                 ]
                                                 []
+                                            , Html.text " "
+                                            , Html.button
+                                                [ Html.onClick (Message.RemoveChunk index) ]
+                                                [ Html.text "Remove" ]
                                             ]
                         , Html.p
                             [ Attr.style "font-family" "sans-serif"

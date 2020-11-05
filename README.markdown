@@ -18,7 +18,7 @@ punctuation. If that is important to you, you'll have to use something else.
 - [x] Avoid defaulting times to zero (and other values). (Instead drop those items?)
 - [x] Allow editing a single word at a time.
 - [x] Allow changing speaker names.
-- [ ] Delete a word.
+- [x] Delete a word.
 - [ ] Combine two words.
 - [ ] Split a word.
 - [ ] Improve performance of speaker identification.

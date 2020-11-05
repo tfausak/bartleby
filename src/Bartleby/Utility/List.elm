@@ -6,6 +6,7 @@ module Bartleby.Utility.List exposing
     , groupBy
     , groupOn
     , index
+    , removeAt
     , span
     , takeWhile
     , updateAt
@@ -83,6 +84,20 @@ index n xs =
                 index (n - 1) ys
 
 
+removeAt : Int -> List a -> List a
+removeAt n xs =
+    case xs of
+        [] ->
+            []
+
+        x :: ys ->
+            if n == 0 then
+                ys
+
+            else
+                x :: removeAt (n - 1) ys
+
+
 span : (a -> Bool) -> List a -> ( List a, List a )
 span f xs =
     ( takeWhile f xs, dropWhile f xs )
@@ -103,12 +118,14 @@ takeWhile f xs =
 
 
 updateAt : Int -> (a -> a) -> List a -> List a
-updateAt n f =
-    List.indexedMap
-        (\i x ->
-            if i == n then
-                f x
+updateAt n f xs =
+    case xs of
+        [] ->
+            []
+
+        x :: ys ->
+            if n == 0 then
+                f x :: ys
 
             else
-                x
-        )
+                x :: updateAt (n - 1) f ys
