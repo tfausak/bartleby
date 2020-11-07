@@ -26,6 +26,8 @@ jobs:
         with:
           name: bartleby-${{ github.sha }}.html
           path: index.html
+      - run: git config user.email '${{ github.actor }}@invalid'
+      - run: git config user.name '@${{ github.actor }}'
       - run: git init
       - run: git checkout -b github-pages
       - run: git remote add origin git@github.com:${{ github.repository }}.git
