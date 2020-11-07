@@ -19,18 +19,20 @@ view model =
     { title = "Bartleby"
     , body =
         [ Html.div
-            [ Attr.style "left" "0"
-            , Attr.style "position" "fixed"
-            , Attr.style "top" "0"
-            , Attr.style "width" "20em"
-            ]
-            (viewSide model)
-        , Html.div
             [ Attr.style "font-family" "sans-serif"
             , Attr.style "line-height" "1.5em"
-            , Attr.style "margin-left" "20em"
             ]
-            (viewMain model)
+            [ Html.div
+                [ Attr.style "left" "0"
+                , Attr.style "position" "fixed"
+                , Attr.style "top" "0"
+                , Attr.style "width" "20em"
+                ]
+                (viewSide model)
+            , Html.div
+                [ Attr.style "margin-left" "20em" ]
+                (viewMain model)
+            ]
         ]
     }
 
@@ -171,6 +173,11 @@ viewSide model =
                 ]
                 [ Html.text "Merge word" ]
             ]
+        ]
+    , Html.p []
+        [ Html.a
+            [ Attr.href "https://github.com/tfausak/bartleby" ]
+            [ Html.text "github.com/tfausak/bartleby" ]
         ]
     ]
 
