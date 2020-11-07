@@ -22,10 +22,12 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/download-artifact@v2
+      - id: artifact
+        uses: actions/download-artifact@v2
         with:
           name: bartleby-${{ github.sha }}.html
-      - run: mv 'bartleby-${{ github.sha }}.html' index.html
+      - run: ls -l
+      - run: mv '${{ steps.artifact.outputs.download-path }}/bartleby-${{ github.sha }}.html' index.html
       - run: git init
       - run: git config user.email '${{ github.actor }}@invalid'
       - run: git config user.name '@${{ github.actor }}'
