@@ -17,3 +17,18 @@ jobs:
         with:
           path: index.html
           name: bartleby-${{ github.sha }}.html
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: bartleby-${{ github.sha }}.html
+          path: index.html
+      - run: git init
+      - run: git checkout -b github-pages
+      - run: git remote add origin git@github.com:${{ github.repository }}.git
+      - run: git add index.html
+      - run: git commit -m 'Automatic deploy of ${{ github.sha }}'
+      - run: git push -fu origin github-pages
