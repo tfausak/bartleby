@@ -1,5 +1,7 @@
 # Bartleby
 
+⚠️ I stopped working on this tool and started using [Descript](https://www.descript.com) instead.
+
 This tool is meant to help edit the output of AWS Transcribe without losing any
 information. That means you can import a transcript file, make some edits, and
 get back a transcript file. The most common edits I want to support are editing
